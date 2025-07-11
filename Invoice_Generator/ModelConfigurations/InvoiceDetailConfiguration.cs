@@ -22,7 +22,7 @@ namespace Invoice_Generator.ModelConfigurations
             entity.Property(e => e.Tax)
                 .HasPrecision(18, 2)
                 .IsRequired();
-
+                  
             entity.Property(e => e.GrandTotal)
                 .HasPrecision(18, 2)
                 .IsRequired();
