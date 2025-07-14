@@ -22,7 +22,6 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductPrice, ProductPriceService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
-builder.Services.AddScoped<IInvoiceDetailService, InvoiceDetailService>();
 
 var app = builder.Build();
 

@@ -15,15 +15,63 @@ namespace Invoice_Generator.Services.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task AddInvoiceAsync(InvoiceCreateDto invoice)
+        public async Task AddInvoiceAsync(InvoiceRequestDto invoice)
         {
             var invoiceModel = new Invoice
             {
                 CustomerId = invoice.CustomerId,
                 InvoiceDate = invoice.InvoiceDate,
+                InvoiceDetails = new List<InvoiceDetail>()
             };
 
+            decimal grandTotal = 0;
+            var today = DateTime.UtcNow.Date;
+
+            foreach (var item in invoice.Items)
+            {
+                var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
+                if (product == null)
+                {
+                    throw new ArgumentException($"Product with ID {item.ProductId} does not exist.");
+                }
+
+                var productPrice = _unitOfWork.ProductPrices.Query()
+                    .Where(p => p.ProductId == item.ProductId &&
+                                today >= p.EffectiveFrom.Date &&
+                                (p.EffectiveTo == null || today <= p.EffectiveTo.Value.Date))
+                    .FirstOrDefault()?.Price ?? 0;
+
+                var qty = item.Quantity;
+                var subTotal = productPrice * qty;
+                var taxAmt = subTotal * (product.TaxPercentage)/100;
+                var totalAmt = subTotal + taxAmt;
+
+                invoiceModel.InvoiceDetails.Add(new InvoiceDetail
+                {
+                    ProductId = item.ProductId,
+                    Quantity = qty,
+                    Rate = productPrice,
+                    SubTotal = subTotal,
+                    Tax = taxAmt,
+                    Total = totalAmt,
+                    GrandTotal = totalAmt
+                });
+
+                invoiceModel.SubTotal = subTotal;
+                invoiceModel.TaxTotal = taxAmt;
+
+                grandTotal += totalAmt;
+            }
+
+            invoiceModel.GrandTotal = grandTotal;
+
             await _unitOfWork.Invoices.AddAsync(invoiceModel);
+
+            foreach (var detail in invoiceModel.InvoiceDetails)
+            {
+                await _unitOfWork.InvoiceDetails.AddAsync(detail);
+            }
+
             await _unitOfWork.SaveAsync();
         }
 

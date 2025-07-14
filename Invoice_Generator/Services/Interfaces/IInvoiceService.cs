@@ -7,7 +7,7 @@ namespace Invoice_Generator.Services.Interfaces
     {
         Task<IEnumerable<Invoice>> GetAllInvoicesAsync();
         Task<Invoice?> GetInvoiceByIdAsync(int id);
-        Task AddInvoiceAsync(InvoiceCreateDto invoice);
+        Task AddInvoiceAsync(InvoiceRequestDto invoice);
         Task<bool> DeleteInvoiceAsync(int id);
     }
 }

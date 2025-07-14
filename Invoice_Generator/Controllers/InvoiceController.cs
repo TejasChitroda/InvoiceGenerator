@@ -30,7 +30,7 @@ namespace Invoice_Generator.Controllers
             return Ok(invoice);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateInvoice([FromBody] InvoiceCreateDto invoiceCreateDto)
+        public async Task<IActionResult> CreateInvoice([FromBody] InvoiceRequestDto invoiceCreateDto)
         {
             if (!ModelState.IsValid)
             {
