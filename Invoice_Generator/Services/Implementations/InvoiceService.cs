@@ -26,14 +26,15 @@ namespace Invoice_Generator.Services.Implementations
 
             decimal grandTotal = 0;
             var today = DateTime.UtcNow.Date;
+            decimal SubTotalForInvoice = 0;
+            decimal TaxTotalForInvoice = 0;
 
             foreach (var item in invoice.Items)
             {
                 var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
+                
                 if (product == null)
-                {
                     throw new ArgumentException($"Product with ID {item.ProductId} does not exist.");
-                }
 
                 var productPrice = _unitOfWork.ProductPrices.Query()
                     .Where(p => p.ProductId == item.ProductId &&
@@ -57,16 +58,21 @@ namespace Invoice_Generator.Services.Implementations
                     GrandTotal = totalAmt
                 });
 
-                invoiceModel.SubTotal = subTotal;
-                invoiceModel.TaxTotal = taxAmt;
-
+                invoiceModel.TaxTotal = product.TaxPercentage;
                 grandTotal += totalAmt;
+                SubTotalForInvoice += subTotal;
+                TaxTotalForInvoice += taxAmt;
             }
 
             invoiceModel.GrandTotal = grandTotal;
+            invoiceModel.SubTotal = SubTotalForInvoice;
+            invoiceModel.TaxTotal = TaxTotalForInvoice;
+            
+            
 
             await _unitOfWork.Invoices.AddAsync(invoiceModel);
 
+            // Replace AddRangeAsync with a loop to add each InvoiceDetail individually
             foreach (var detail in invoiceModel.InvoiceDetails)
             {
                 await _unitOfWork.InvoiceDetails.AddAsync(detail);

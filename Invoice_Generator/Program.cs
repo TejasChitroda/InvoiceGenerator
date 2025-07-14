@@ -23,7 +23,21 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductPrice, ProductPriceService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")  // Angular app URL
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
+
+// Apply CORS policy before other middlewares
+app.UseCors("AllowAngularApp");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -32,7 +46,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+
 
 app.UseAuthorization();
 
