@@ -1,4 +1,6 @@
-﻿namespace Invoice_Generator.Repository
+﻿using Invoice_Generator.Models;
+
+namespace Invoice_Generator.Repository
 {
     public interface IGenericRepository<T> where T : class
     {

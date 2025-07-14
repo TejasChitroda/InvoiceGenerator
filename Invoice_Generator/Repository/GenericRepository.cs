@@ -1,4 +1,5 @@
 ﻿using Invoice_Generator.Data;
+using Invoice_Generator.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -46,5 +47,6 @@ namespace Invoice_Generator.Repository
         {
             _dbSet.Update(entity);
         }
+
     }
 }
