@@ -13,14 +13,14 @@ public class ProductPriceServiceTest
 {
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IGenericRepository<ProductPrice>> _productPriceRepoMock;
-    private readonly ProductPriceService _service;
+    private readonly IProductPriceService _service;
 
     public ProductPriceServiceTest()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _productPriceRepoMock = new Mock<IGenericRepository<ProductPrice>>();
         _unitOfWorkMock.Setup(u => u.ProductPrices).Returns(_productPriceRepoMock.Object);
-        _service = new ProductPriceService(_unitOfWorkMock.Object);
+        _service = new IProductPriceService(_unitOfWorkMock.Object);
     }
 
     [Fact]

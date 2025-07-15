@@ -56,7 +56,7 @@ namespace Invoice_Generator.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductById(int id, [FromBody] ProductDto product)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
                 return BadRequest("Product data is invalid");
             }

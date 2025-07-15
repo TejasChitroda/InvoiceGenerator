@@ -57,7 +57,7 @@ namespace Invoice_Generator.Controllers
         [HttpPut("id")]
         public async Task<IActionResult> UpdateCategoryById([FromBody] CategoryDto category, int id)
         {
-            if (id == null)
+            if (id == 0 || id == null)
             {
                 return BadRequest();
             }

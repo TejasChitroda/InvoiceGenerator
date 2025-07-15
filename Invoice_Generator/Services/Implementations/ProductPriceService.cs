@@ -4,11 +4,11 @@ using Invoice_Generator.UoW;
 
 namespace Invoice_Generator.Services.Implementations
 {
-    public class ProductPriceService : IProductPrice
+    public class IProductPriceService : IProductPrice
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ProductPriceService(IUnitOfWork unitOfWork)
+        public IProductPriceService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
