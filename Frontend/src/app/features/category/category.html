@@ -1,0 +1,31 @@
+<div class="container">
+    <form (ngSubmit)="submitCategory()" #form="ngForm">
+    <input type="text" [(ngModel)]="category.name" name="name" placeholder="Name" required />
+    <input type="text" [(ngModel)]="category.description" name="description" placeholder="description" required />
+ 
+    <button type="submit">{{ isEdit ? 'Update' : 'Add' }} Category</button>
+    <button type="button" (click)="resetForm()" *ngIf="isEdit">Cancel</button>
+  </form>
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let c of categories">
+                <td>{{ c.name }}</td>
+                <td>{{ c.description }}</td>
+
+                <td>
+          <button class="btn btn-success  me-2" (click)="editForm(c)">Edit</button>
+          <button class="btn btn-danger"(click)="deleteCategoryById(c.id!)">Delete</button>
+        </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
