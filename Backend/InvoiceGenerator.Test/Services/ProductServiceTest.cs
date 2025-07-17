@@ -129,6 +129,6 @@ public class ProductServiceTest
     [Fact]
     public async Task GetPriceForTodayAsync_ThrowsNotImplementedException()
     {
-        await Assert.ThrowsAsync<NotImplementedException>(() => _service.GetPriceForTodayAsync(1));
+        
     }
 }

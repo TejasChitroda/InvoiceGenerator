@@ -52,9 +52,21 @@ namespace Invoice_Generator.Services.Implementations
             return true;
         }
 
-        public Task<decimal?> GetPriceForTodayAsync(int productId)
+        public async Task<decimal?> GetPriceForTodayAsync(int productId)
         {
-            throw new NotImplementedException();
+            var now = DateTime.UtcNow; 
+            
+            var price = await Task.Run(() =>
+                (from p in _unitOfWork.Products.Query()
+                 join pp in _unitOfWork.ProductPrices.Query() on p.Id equals pp.ProductId
+                 where p.Id == productId
+                    && pp.EffectiveFrom <= now
+                    && (pp.EffectiveTo == null || now <= pp.EffectiveTo)
+                 orderby pp.EffectiveFrom descending
+                 select pp.Price
+                ).FirstOrDefault()
+            );
+            return price == 0 ? (decimal?)null : price;
         }
     }
 }

@@ -89,16 +89,16 @@ namespace Invoice_Generator.Controllers
             return NoContent();
         }
 
-        //[HttpGet("price/{productId}")]
-        //public async Task<IActionResult> GetPriceForToday(int productId)
-        //{
-        //    var price = await _productService.GetPriceForTodayAsync(productId);
-        //    if (price == null)
-        //    {
-        //        return NotFound("Price not found for today");
-        //    }
-        //    return Ok(price);
+        [HttpGet("price/{productId}")]
+        public async Task<IActionResult> GetPriceForToday(int productId)
+        {
+            var price = await _productService.GetPriceForTodayAsync(productId);
+            if (price == null)
+            {
+                return NotFound("Price not found for today");
+            }
+            return Ok(price);
 
-        //}
+        }
     }
 }
