@@ -1,4 +1,4 @@
-import { Product } from './product.model';
+import { ProductModel } from './product.model';
 
 export interface ProductPrice {
   id: number;
@@ -6,5 +6,5 @@ export interface ProductPrice {
   price: number;
   effectiveFrom: Date;
   effectiveTo?: Date;           // Optional because it can be null in C#
-  product?: Product;   
+  product?: ProductModel;   
 }

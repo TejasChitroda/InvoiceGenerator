@@ -1,0 +1,80 @@
+<div class="container"> 
+    <h2>Create Invoice</h2>
+ 
+    <select [(ngModel)]="selectedCustomerId">
+        <option value="0">Select Customer</option>
+        <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
+    </select>
+ 
+    <div class="item-add">
+        <select [(ngModel)]="selectedProductId">
+            <option value="0">Select Product</option>
+            <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+        </select> 
+ 
+         <input type="number" [(ngModel)]="quantity" min="1" />
+        <button [disabled]="!isFormValid()" (click)="addItem()">Add</button>
+    </div>
+ 
+    <ul *ngIf="products.length > 0">
+        <li *ngFor="let i of items">
+            {{ getProductName(i.productId) }} - Qty: {{ i.quantity }}
+        </li>
+    </ul>
+ 
+ 
+    <button (click)="submitInvoice()">Submit Invoice</button>
+ 
+    
+    <hr />
+ 
+    <h3>All Invoices</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let invoice of invoices" (click)="openInvoiceDetails(invoice.id!)"
+                style="cursor: pointer;">
+                <td>{{ getCustomerName(invoice.customerId) }}</td>
+                <td>{{ invoice.invoiceDate | date }}</td>
+                <td>{{ invoice.grantTotal }}</td>
+            </tr>
+        </tbody>
+    </table>
+ 
+    <div class="modal" *ngIf="showModal">
+        <div class="modal-content">
+            <span class="close-btn" (click)="closeModal()">&times;</span>
+            <h3>Invoice Details</h3>
+ 
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Rate</th>
+                        <th>SubTotal</th>
+                        <th>Tax</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let detail of selectedInvoiceDetails">
+                        <td>{{ getProductName(detail.productId) }}</td>
+                        <td>{{ detail.quantity }}</td>
+                        <td>{{ detail.rate }}</td>
+                        <td>{{ detail.subTotal }}</td>
+                        <td>{{ detail.total }}</td>
+                        <td>{{ detail.grandTotal }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+ 
+</div>

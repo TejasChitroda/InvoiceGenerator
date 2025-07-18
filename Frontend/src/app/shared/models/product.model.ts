@@ -1,8 +1,8 @@
 import { CategoryModel } from './category.model';
 import { ProductPrice } from './productPrice.model';
 
-export interface Product {
-  id: number;
+export interface ProductModel {
+  id?: number;
   name: string;
   description: string;
   taxPercentage: number;

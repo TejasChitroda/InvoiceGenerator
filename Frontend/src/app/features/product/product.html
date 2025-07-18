@@ -1,0 +1,50 @@
+
+<div class="container">
+<form (ngSubmit)="submitProduct()" #form="ngForm">
+    <input type="text" [(ngModel)]="productData.name" name="name" placeholder="Name" required />
+
+      <label for="categoryId">Category</label>
+    <select [(ngModel)]="productData.categoryId" name="categoryId" required>
+        <option value="" disabled selected>Select Category</option>
+        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+    </select>
+
+    <input type="number" [(ngModel)]="productData.taxPercentage" name="taxPercentage" placeholder="taxPercentage" required />
+    <input type="text" [(ngModel)]="productData.description" name="description" placeholder="description" required />
+
+    <button type="submit">{{ isEdit ? 'Update' : 'Add' }} Product</button>
+    <button type="button" (click)="resetForm()" *ngIf="isEdit">Cancel</button>
+  </form>
+
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Tax Persentage</th>
+        <th>CategoryId</th>
+        <th>Description</th>
+        
+        <th>Actions</th>
+        <th>Set Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of products">
+        <td>{{ c.name }}</td>
+        <td>{{ c.taxPercentage }}</td>
+        <td>{{ c.category?.id }}</td>
+        <td>{{ c.description }}</td>
+        
+
+        <td>
+          <button class="btn btn-success  me-2" (click)="editForm(c)">Edit</button>
+          <button class="btn btn-danger"(click)="deleteProductById(c.id!)">Delete</button>
+        </td>
+        <td>
+          <button class="btn btn-info">Set Price</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  </div>

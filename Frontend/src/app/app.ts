@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink, RouterModule, RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { Category } from "./features/category/category";
 
 @Component({
   selector: 'app-root',
@@ -13,8 +14,9 @@ import { CommonModule } from '@angular/common';
     HttpClientModule,
     RouterLink,
     RouterModule,
-    CommonModule
-  ],
+    CommonModule,
+    Category
+],
   templateUrl: './app.html',
   styleUrls: ['./app.css']   // ✅ use styleUrls (plural)
 })

@@ -20,7 +20,7 @@ namespace Invoice_Generator.Services.Implementations
             var invoiceModel = new Invoice
             {
                 CustomerId = invoice.CustomerId,
-                InvoiceDate = invoice.InvoiceDate,
+                InvoiceDate = DateTime.UtcNow,
                 InvoiceDetails = new List<InvoiceDetail>()
             };
 

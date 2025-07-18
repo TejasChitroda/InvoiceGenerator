@@ -1,5 +1,5 @@
-import { Invoice } from './invoice.model';
-import { Product } from './product.model';
+import { InvoiceModel } from './invoice.model';
+import { ProductModel } from './product.model';
 
 export interface InvoiceDetail {
   id: number;
@@ -11,6 +11,6 @@ export interface InvoiceDetail {
   tax: number;
   total: number;
   grandTotal: number;
-  invoice?: Invoice;     // optional navigation
-  product?: Product;     // optional navigation
+  invoice?: InvoiceModel;     // optional navigation
+  product?: ProductModel;     // optional navigation
 }
