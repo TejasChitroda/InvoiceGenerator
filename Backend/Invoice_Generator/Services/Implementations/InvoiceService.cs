@@ -67,8 +67,6 @@ namespace Invoice_Generator.Services.Implementations
             invoiceModel.GrandTotal = grandTotal;
             invoiceModel.SubTotal = SubTotalForInvoice;
             invoiceModel.TaxTotal = TaxTotalForInvoice;
-            
-            
 
             await _unitOfWork.Invoices.AddAsync(invoiceModel);
 
