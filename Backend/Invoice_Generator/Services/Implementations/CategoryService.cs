@@ -1,6 +1,7 @@
 ﻿using Invoice_Generator.Models;
 using Invoice_Generator.Services.Interfaces;
 using Invoice_Generator.UoW;
+using Microsoft.EntityFrameworkCore;
 
 namespace Invoice_Generator.Services.Implementations
 {
@@ -29,6 +30,7 @@ namespace Invoice_Generator.Services.Implementations
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
+           
             return await _unitOfWork.Categories.GetAllAsync();
         }
 

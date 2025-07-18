@@ -48,5 +48,6 @@ namespace Invoice_Generator.Repository
             _dbSet.Update(entity);
         }
 
+
     }
 }

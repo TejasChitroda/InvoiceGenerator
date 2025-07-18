@@ -1,10 +1,11 @@
 ﻿using Invoice_Generator.Models;
+using InvoiceGenerator.DTOs;
 
 namespace Invoice_Generator.Services.Interfaces
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetAllProductAsync();
+        Task<IEnumerable<ProductGetDto>> GetAllProductAsync();
         Task<Product?> GetProductByIdAsync(int id);
         Task<decimal?> GetPriceForTodayAsync(int productId);
         Task AddProductAsync(Product product);
