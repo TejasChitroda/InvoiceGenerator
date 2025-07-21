@@ -13,9 +13,14 @@ namespace Invoice_Generator.ModelConfigurations
             .IsRequired();
 
             entity.Property(e => e.EffectiveFrom)
-                .IsRequired();
+                .IsRequired(false)
+                .HasColumnType("datetime");
 
             entity.Property(e => e.EffectiveTo)
+                .IsRequired(false)
+                .HasColumnType("datetime");
+
+            entity.Property(e => e.IsDefault)
                 .IsRequired();
 
             entity.HasOne(e => e.Product)

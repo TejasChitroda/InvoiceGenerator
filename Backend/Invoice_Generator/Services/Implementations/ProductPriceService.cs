@@ -1,4 +1,5 @@
-﻿using Invoice_Generator.Models;
+﻿using Invoice_Generator.DTOs;
+using Invoice_Generator.Models;
 using Invoice_Generator.Services.Interfaces;
 using Invoice_Generator.UoW;
 
@@ -15,6 +16,69 @@ namespace Invoice_Generator.Services.Implementations
         public async Task AddPriceAsync(ProductPrice productPrice)
         {
             await _unitOfWork.ProductPrices.AddAsync(productPrice);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task AddPriceWithDefaultPriceAsync(ProductPriceDto productPriceDto)
+        {
+            var product = await _unitOfWork.Products.GetByIdAsync(productPriceDto.ProductId);
+
+            if(product == null)
+            {
+                throw new Exception("Product Not Found");
+            }
+
+            if(productPriceDto.IsDefault)
+            {
+                var defaultPrice = await _unitOfWork.ProductPrices
+                    .FindAsync(p => p.ProductId == productPriceDto.ProductId && p.IsDefault);
+
+                if(defaultPrice.Any())
+                {
+                    throw new Exception("Default price already exists for this product.");
+                }
+
+                var newPrice = new ProductPrice
+                {
+                    ProductId = productPriceDto.ProductId,
+                    Price = productPriceDto.Price,
+                    EffectiveFrom = null,
+                    EffectiveTo = null,
+                    IsDefault = true
+                };
+
+                await _unitOfWork.ProductPrices.AddAsync(newPrice);
+            }
+            else
+            {
+                if(productPriceDto.EffectiveFrom == null || productPriceDto.EffectiveTo == null)
+                {
+                    throw new Exception("Effective dates must be provided for non-default prices.");
+                }
+                if(productPriceDto.EffectiveFrom >= productPriceDto.EffectiveTo)
+                {
+                    throw new Exception("Effective From date must be earlier than Effective To date.");
+                }
+
+                var existingPrice = await _unitOfWork.ProductPrices.FindAsync(p => p.ProductId == productPriceDto.ProductId && !p.IsDefault);
+
+                if (existingPrice.Any(p => p.EffectiveFrom <= productPriceDto.EffectiveTo && p.EffectiveTo >= productPriceDto.EffectiveFrom))
+                {
+                    throw new Exception("There is already a price for this product that overlaps with the provided effective dates.");
+                }
+
+                var newPrice = new ProductPrice
+                {
+                    ProductId = productPriceDto.ProductId,
+                    Price = productPriceDto.Price,
+                    EffectiveFrom = productPriceDto.EffectiveFrom,
+                    EffectiveTo = productPriceDto.EffectiveTo,
+                    IsDefault = false
+                };
+
+                await _unitOfWork.ProductPrices.AddAsync(newPrice);
+            }
+
             await _unitOfWork.SaveAsync();
         }
 

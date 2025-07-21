@@ -92,7 +92,7 @@ namespace Invoice_Generator.Controllers
         [HttpGet("price/{productId}")]
         public async Task<IActionResult> GetPriceForToday(int productId)
         {
-            var price = await _productService.GetPriceForTodayAsync(productId);
+            var price = await _productService.GetTodaysPriceAsync(productId);
             if (price == null)
             {
                 return NotFound("Price not found for today");

@@ -1,4 +1,5 @@
-﻿using Invoice_Generator.Models;
+﻿using Invoice_Generator.DTOs;
+using Invoice_Generator.Models;
 
 namespace Invoice_Generator.Services.Interfaces
 {
@@ -10,5 +11,7 @@ namespace Invoice_Generator.Services.Interfaces
         Task AddPriceAsync(ProductPrice productPrice);
         Task<bool> UpdatePriceAsync(ProductPrice productPrice);
         Task<bool> DeletePriceAsync(int id);
+
+        Task AddPriceWithDefaultPriceAsync(ProductPriceDto productPriceDto);
     }
 }

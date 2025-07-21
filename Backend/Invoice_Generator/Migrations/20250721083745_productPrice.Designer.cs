@@ -4,6 +4,7 @@ using Invoice_Generator.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Invoice_Generator.Migrations
 {
     [DbContext(typeof(InvoiceDbContext))]
-    partial class InvoiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721083745_productPrice")]
+    partial class productPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,11 +188,11 @@ namespace Invoice_Generator.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("EffectiveFrom")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("EffectiveFrom")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("EffectiveTo")
-                        .HasColumnType("datetime");
+                    b.Property<DateTime>("EffectiveTo")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDefault")
                         .HasColumnType("bit");

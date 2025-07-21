@@ -41,25 +41,19 @@ namespace Invoice_Generator.Controllers
             }
             return Ok(price);
         }
-        [HttpPost]
-        public async Task<IActionResult> AddPrice([FromBody] ProductPriceDto productPrice)
+      
+        [HttpPost("AddPriceDefault")]
+        public async Task<IActionResult> AddPriceWithDefault([FromBody] ProductPriceDto productPriceDto)
         {
-            if (productPrice == null)
+            if(productPriceDto == null)
             {
                 return BadRequest("Product price cannot be null.");
             }
 
-            var productPriceModel = new ProductPrice
-            {
-                ProductId = productPrice.ProductId,
-                Price = productPrice.Price,
-                EffectiveFrom = productPrice.EffectiveFrom,
-                EffectiveTo = productPrice.EffectiveTo
-            };
-
-            await _productPriceService.AddPriceAsync(productPriceModel);
-            return Ok(productPriceModel);
+            await _productPriceService.AddPriceWithDefaultPriceAsync(productPriceDto);
+            return Ok(productPriceDto);
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePrice(int id, [FromBody] ProductPriceDto productPrice)
         {

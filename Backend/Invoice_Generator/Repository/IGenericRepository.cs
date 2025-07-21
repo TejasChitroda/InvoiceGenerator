@@ -1,4 +1,5 @@
-﻿using Invoice_Generator.Models;
+﻿
+using System.Linq.Expressions;
 
 namespace Invoice_Generator.Repository
 {
@@ -10,5 +11,6 @@ namespace Invoice_Generator.Repository
         void Update(T entity);
         void Delete(T entity);
         IQueryable<T> Query();
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
     }
 }

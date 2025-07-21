@@ -7,7 +7,7 @@ namespace Invoice_Generator.Services.Interfaces
     {
         Task<IEnumerable<ProductGetDto>> GetAllProductAsync();
         Task<Product?> GetProductByIdAsync(int id);
-        Task<decimal?> GetPriceForTodayAsync(int productId);
+        Task<decimal?> GetTodaysPriceAsync(int productId);
         Task AddProductAsync(Product product);
         Task<bool> UpdateAsync(Product product);
         Task<bool> DeleteAsync(int id);

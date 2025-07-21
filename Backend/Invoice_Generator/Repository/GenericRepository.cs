@@ -2,6 +2,7 @@
 using Invoice_Generator.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq.Expressions;
 
 namespace Invoice_Generator.Repository
 {
@@ -46,6 +47,11 @@ namespace Invoice_Generator.Repository
         public void Update(T entity)
         {
             _dbSet.Update(entity);
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
         }
 
 

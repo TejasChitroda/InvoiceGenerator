@@ -1,4 +1,5 @@
 ﻿using Invoice_Generator.DTOs;
+using Invoice_Generator.Migrations;
 using Invoice_Generator.Models;
 using Invoice_Generator.Services.Interfaces;
 using Invoice_Generator.UoW;
@@ -36,7 +37,7 @@ namespace Invoice_Generator.Services.Implementations
                 {
                     Id = price.Id,
                     Price = price.Price,
-                    EffectiveFrom = price.EffectiveFrom,
+                    EffectiveFrom = (DateTime)price.EffectiveFrom,
                     EffectiveTo = price.EffectiveTo
                 }).ToList() ?? new List<ProductPriceGetDto>()
             });
@@ -79,21 +80,28 @@ namespace Invoice_Generator.Services.Implementations
             return true;
         }
 
-        public async Task<decimal?> GetPriceForTodayAsync(int productId)
+        public async Task<decimal?> GetTodaysPriceAsync(int productId)
         {
-            var now = DateTime.UtcNow; 
-            
-            var price = await Task.Run(() =>
-                (from p in _unitOfWork.Products.Query()
-                 join pp in _unitOfWork.ProductPrices.Query() on p.Id equals pp.ProductId
-                 where p.Id == productId
-                    && pp.EffectiveFrom <= now
-                    && (pp.EffectiveTo == null || now <= pp.EffectiveTo)
-                 orderby pp.EffectiveFrom descending
-                 select pp.Price
-                ).FirstOrDefault()
-            );
-            return price == 0 ? (decimal?)null : price;
+            var now = DateTime.UtcNow;
+
+            var p = 0;
+
+            var defaultProductPrice = (await _unitOfWork.ProductPrices.FindAsync(p => p.ProductId == productId && p.IsDefault)).FirstOrDefault();
+
+            var produtPriceForToday = await _unitOfWork.ProductPrices.FindAsync(p =>
+                p.ProductId == productId &&
+                !p.IsDefault &&
+                p.EffectiveFrom.HasValue &&
+                p.EffectiveTo.HasValue &&
+                p.EffectiveFrom <= now &&
+                p.EffectiveTo >= now);
+
+            var price = produtPriceForToday.FirstOrDefault();
+
+            if (price != null)
+                return price.Price;
+
+            return defaultProductPrice?.Price;
         }
     }
 }

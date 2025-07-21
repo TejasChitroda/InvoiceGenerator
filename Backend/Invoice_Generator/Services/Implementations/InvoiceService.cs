@@ -32,36 +32,46 @@ namespace Invoice_Generator.Services.Implementations
             foreach (var item in invoice.Items)
             {
                 var product = await _unitOfWork.Products.GetByIdAsync(item.ProductId);
-                
+
                 if (product == null)
                     throw new ArgumentException($"Product with ID {item.ProductId} does not exist.");
 
-                var productPrice = _unitOfWork.ProductPrices.Query()
-                    .Where(p => p.ProductId == item.ProductId &&
-                                today >= p.EffectiveFrom.Date &&
-                                (p.EffectiveTo == null || today <= p.EffectiveTo.Value.Date))
-                    .FirstOrDefault()?.Price ?? 0;
+                var productPrice = (await _unitOfWork.ProductPrices.FindAsync(p =>
+                             p.ProductId == item.ProductId &&
+                             !p.IsDefault &&
+                             p.EffectiveFrom != null &&
+                             p.EffectiveTo != null &&
+                             today >= p.EffectiveFrom.Value.Date &&
+                             today <= p.EffectiveTo.Value.Date))
+                             .FirstOrDefault()?.Price;
+
+                if (productPrice == null || productPrice == 0)
+                {
+                    productPrice = (await _unitOfWork.ProductPrices
+                             .FindAsync(p => p.ProductId == item.ProductId && p.IsDefault))
+                             .FirstOrDefault()?.Price ?? 0;
+                }
 
                 var qty = item.Quantity;
                 var subTotal = productPrice * qty;
-                var taxAmt = subTotal * (product.TaxPercentage)/100;
+                var taxAmt = subTotal * (product.TaxPercentage) / 100;
                 var totalAmt = subTotal + taxAmt;
 
                 invoiceModel.InvoiceDetails.Add(new InvoiceDetail
                 {
                     ProductId = item.ProductId,
                     Quantity = qty,
-                    Rate = productPrice,
-                    SubTotal = subTotal,
-                    Tax = taxAmt,
-                    Total = totalAmt,
-                    GrandTotal = totalAmt
+                    Rate = (decimal)productPrice,
+                    SubTotal = (decimal)subTotal,
+                    Tax = (decimal)taxAmt,
+                    Total = (decimal)totalAmt,
+                    GrandTotal = (decimal)totalAmt
                 });
 
                 invoiceModel.TaxTotal = product.TaxPercentage;
-                grandTotal += totalAmt;
-                SubTotalForInvoice += subTotal;
-                TaxTotalForInvoice += taxAmt;
+                grandTotal += (decimal)totalAmt;
+                SubTotalForInvoice += (decimal)subTotal;
+                TaxTotalForInvoice += (decimal)taxAmt;
             }
 
             invoiceModel.GrandTotal = grandTotal;
