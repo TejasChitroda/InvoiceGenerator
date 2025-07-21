@@ -1,50 +1,72 @@
-
 <div class="container">
-<form (ngSubmit)="submitProduct()" #form="ngForm">
-    <input type="text" [(ngModel)]="productData.name" name="name" placeholder="Name" required />
+  <h2>🛒 Manage Products</h2>
 
-      <label for="categoryId">Category</label>
-    <select [(ngModel)]="productData.categoryId" name="categoryId" required>
-        <option value="" disabled selected>Select Category</option>
-        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+  <form (ngSubmit)="submitForm()">
+    <input type="text" [(ngModel)]="productFormItem.name" name="name" placeholder="Product Name" required />
+    <input type="number" [(ngModel)]="productFormItem.taxPercentage" name="tax" placeholder="Tax %" required />
+
+    <select [(ngModel)]="productFormItem.categoryId" name="categoryId" required>
+      <option value="" disabled selected>Select Category</option>
+      <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
     </select>
 
-    <input type="number" [(ngModel)]="productData.taxPercentage" name="taxPercentage" placeholder="taxPercentage" required />
-    <input type="text" [(ngModel)]="productData.description" name="description" placeholder="description" required />
+    <input type="text" [(ngModel)]="productFormItem.description" name="tax" placeholder="description" required />
 
-    <button type="submit">{{ isEdit ? 'Update' : 'Add' }} Product</button>
-    <button type="button" (click)="resetForm()" *ngIf="isEdit">Cancel</button>
+
+
+    <button type="submit">{{ isEditing ? 'Update' : 'Add' }} Product</button>
+    <button type="button" (click)="resetForm()" *ngIf="isEditing">Cancel</button>
   </form>
 
+  <hr />
 
+  <h3>Product List</h3>
   <table>
     <thead>
       <tr>
         <th>Name</th>
-        <th>Tax Persentage</th>
-        <th>CategoryId</th>
-        <th>Description</th>
-        
+        <th>Tax</th>
+        <th>Category</th>
+        <th>Price (Today)</th>
         <th>Actions</th>
-        <th>Set Price</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let c of products">
-        <td>{{ c.name }}</td>
-        <td>{{ c.taxPercentage }}</td>
-        <td>{{ c.category?.id }}</td>
-        <td>{{ c.description }}</td>
-        
-
+      <tr *ngFor="let p of products">
+        <td>{{ p.name }}</td>
+        <td>{{ p.taxPercentage }}%</td>
+        <td>{{ getCategoryName(p.categoryId) }}</td>
+        <td><button (click)="getTodayPrice(p.id!)">Check</button></td>
         <td>
-          <button class="btn btn-success  me-2" (click)="editForm(c)">Edit</button>
-          <button class="btn btn-danger"(click)="deleteProductById(c.id!)">Delete</button>
-        </td>
-        <td>
-          <button class="btn btn-info">Set Price</button>
+          <button (click)="edit(p)">Edit</button>
+          <button (click)="delete(p.id!)">Delete</button>
         </td>
       </tr>
     </tbody>
   </table>
-  </div>
+
+
+   <hr />
+  <h3> Set Product Price</h3>
+
+ <form (ngSubmit)="setPrice()">
+
+  <select [(ngModel)]="priceFormItem.productId" name="productId" title="Select Product" required>
+    <option value="" disabled selected>Select Product</option>
+    <option *ngFor="let p of products" [value]="p.id">{{ p.name }}</option>
+  </select>
+
+  <input type="number" [(ngModel)]="priceFormItem.price" name="price" placeholder="Price" required />
+
+
+  <input type="text" [(ngModel)]="priceFormItem.isDefault" name="isDefaultText"
+    (ngModelChange)="onDefaultChange()" placeholder="Yes/No" required />
+
+  <input type="date" [(ngModel)]="priceFormItem.effectiveFrom" name="fromDate"
+    [disabled]="priceFormItem.isDefault" />
+
+  <input type="date" [(ngModel)]="priceFormItem.effectiveTo" name="toDate"
+    [disabled]="priceFormItem.isDefault" />
+
+  <button type="submit">Set Price</button>
+</form>

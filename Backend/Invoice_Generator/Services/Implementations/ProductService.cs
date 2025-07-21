@@ -84,8 +84,6 @@ namespace Invoice_Generator.Services.Implementations
         {
             var now = DateTime.UtcNow;
 
-            var p = 0;
-
             var defaultProductPrice = (await _unitOfWork.ProductPrices.FindAsync(p => p.ProductId == productId && p.IsDefault)).FirstOrDefault();
 
             var produtPriceForToday = await _unitOfWork.ProductPrices.FindAsync(p =>

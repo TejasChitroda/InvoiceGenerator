@@ -1,10 +1,11 @@
 import { ProductModel } from './product.model';
 
 export interface ProductPrice {
-  id: number;
+  id?: number;
   productId: number;
   price: number;
-  effectiveFrom: Date;
-  effectiveTo?: Date;           // Optional because it can be null in C#
+  effectiveFrom?: string; // Can be a string or Date object
+  isDefault: boolean;
+  effectiveTo?: string;           // Optional because it can be null in C#
   product?: ProductModel;   
 }

@@ -22,4 +22,7 @@ export class InvoiceService {
     getInvoiceDetailsById(id: number) {
         return this.http.get(`${this.apiUrl}/${id}/details`);
     }
+    getInvoiceDetailByInvoiceId(invoiceId: number) {
+        return this.http.get(`${this.apiUrl}/getInvoiceDetail/${invoiceId}`);
+    }
 }

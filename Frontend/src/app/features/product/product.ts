@@ -1,115 +1,156 @@
 import { Component } from '@angular/core';
 import { ProductService } from '../../core/services/product.service';
+import { CategoryService } from '../../core/services/category.service';
+import { CategoryModel } from '../../shared/models/category.model';
 import { ProductModel } from '../../shared/models/product.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CategoryModel } from '../../shared/models/category.model';
-import { CategoryService } from '../../core/services/category.service';
-import { Router, RouterModule } from '@angular/router';
-import { routes } from '../../app.routes';
+import { ProductPrice } from '../../shared/models/productPrice.model';
 
 @Component({
   selector: 'app-product',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule , FormsModule ],
   templateUrl: './product.html',
   styleUrl: './product.css'
 })
 export class Product {
 
   products: ProductModel[] = [];
+  categories: CategoryModel[] = [];
+  isEditing: boolean = false;
+  editId: number | null = null;
+  
+  categoryNames: { [productId: number]: string } = {};
 
-  productData: ProductModel = {
-    id: 0,
+  productFormItem: ProductModel = {
     name: '',
     description: '',
-    taxPercentage: 0,
     categoryId: 0,
-  }
-  categories: CategoryModel[] = [];
-  isEdit: boolean = false;  
+    taxPercentage: 0
+  };
 
-  constructor(
-    private productService: ProductService,
-    private categoryService: CategoryService,
-    private router: Router
-  ) {}
+  priceFormItem: ProductPrice = {
+    productId: 0,
+    price: 0,
+    effectiveFrom: '',
+    effectiveTo: '',
+    isDefault: false,
+  };
 
-  ngOnInit() {
-    console.log('Product component initialized');
-    this.getProducts();
+  constructor(private productService: ProductService , private categoryService: CategoryService) { }
+
+
+  ngOnInit()
+  {
+    this.loadProducts();
     this.loadCategories();
   }
 
-  getProducts() {
-    this.productService.getAllProducts().subscribe(products => {
+  loadProducts()
+  {
+    this.productService.getAllProducts().subscribe((products) => {
       this.products = products;
-      console.log('Products fetched:', this.products);
+      console.log(products);
+    });
+  }
+  loadCategories()
+  {
+    this.categoryService.getAllCategories().subscribe((categories) => {
+      this.categories = categories;
+      console.log(categories);
     });
   }
 
-   loadCategories() {
-    this.categoryService.getAllCategories().subscribe(data => {
-      this.categories = data;
-    });
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'Unknown Category';
   }
 
-  submitProduct() {
-    if (this.isEdit) {
-      this.productService.updateProduct(this.productData.id!, this.productData).subscribe(updatedProduct => {
-        console.log('Product updated:', updatedProduct);
+    submitForm() {
+    if (this.isEditing && this.editId) {
+      const updatedProduct: ProductModel = { ...this.productFormItem};
+      this.productService.updateProduct(this.editId, updatedProduct).subscribe(() => {
         this.resetForm();
-      }, error => {
-        console.error('Error updating product:', error);
+        this.loadProducts();
       });
     } else {
-      this.productService.addProduct(this.productData).subscribe(newProduct => {
-        console.log('Product added:', newProduct);
+      this.productService.addProduct(this.productFormItem).subscribe(() => {
         this.resetForm();
-      }, error => {
-        console.error('Error adding product:', error);
+        this.loadProducts();
       });
     }
-    this.getProducts();
   }
 
+  edit(product: ProductModel) {
+    this.productFormItem = { name: product.name, description: product.description, taxPercentage: product.taxPercentage, categoryId: product.categoryId };
+    this.editId = product.id!;
+    this.isEditing = true;
+  }
+
+  
   resetForm() {
-    this.productData = {
-      id: 0,
-      name: '',
-      description: '',
-      taxPercentage: 0,
-      categoryId: 0,
-    };
-    this.isEdit = false; // Reset to add mode
-  } 
-
-  getById(id: number) {
-    this.productService.getById(id).subscribe(product => {
-      this.productData = product;
-      this.isEdit = true; // Set to edit mode
-    }, error => {
-      console.error('Error fetching product by ID:', error);
-    });
+    this.productFormItem = { name: '', description: '', taxPercentage: 0, categoryId: 0 };
+    this.isEditing = false;
+    this.editId = null;
   }
 
-  deleteProductById(id: number) {
-    this.productService.deleteProduct(id).subscribe(() => {
-      console.log('Product deleted successfully');
-      this.getProducts(); // Refresh the product list
-    }, error => {
-      console.error('Error deleting product:', error);
-    });
+  delete(id: number) {
+      if (confirm('Are you sure?')) {
+        this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+    }
   }
 
-  editForm(product: ProductModel) {
-    this.productData = { ...product };
-    this.isEdit = true; // Set to edit mode
+  getTodayPrice(productId: number) {
+    this.productService.getTodaysPrice(productId).subscribe((price) => {
+      alert(`Today's price for product ID ${productId} is ${price}`);
+    }, (error) => {
+      console.error('Error fetching price:', error);
+      alert('Failed to fetch price. Please try again later.');
+    });
   }
 
   setPrice()
   {
-    // here i want to redicet to ProductPriceComponent with productId
-    this.router.navigate(['/product-price', this.productData.id]);
+ this.productService.addPrice(this.getDataFromPriceForm()).subscribe({
+      next: (msg) => {
+        alert(msg);
+        this.priceFormItem = { productId: 0, price: 0, effectiveFrom: '', effectiveTo: '', isDefault: false };
+      },
+      error: (err) => {
+        const errorMessage = typeof err.error === 'string'
+          ? err.error
+          : 'An error occurred while setting the price.';
+        alert(errorMessage);
+      }
+    });
   }
 
+
+  getDataFromPriceForm()
+  {
+    const form = { ...this.priceFormItem};
+
+    const fromDate = form.effectiveFrom && form.effectiveFrom.trim() !== '';
+    const toDate = form.effectiveTo && form.effectiveTo.trim() !== '';
+
+    if (!fromDate || !toDate) {
+      form.isDefault = true;
+      form.effectiveFrom = undefined;
+      form.effectiveTo = undefined;
+    } else {
+      form.isDefault = false;
+    }
+
+    return form;
+  }
+
+  onDefaultChange() {
+  const val = this.priceFormItem.isDefault.toString().trim().toLowerCase();
+  this.priceFormItem.isDefault = (val === 'yes');
+
+  if (this.priceFormItem.isDefault) {
+    this.priceFormItem.effectiveFrom = '';
+    this.priceFormItem.effectiveTo = '';
+  }
+}
 }

@@ -50,5 +50,15 @@ namespace Invoice_Generator.Controllers
             return NoContent();
         }
 
+        [HttpGet("getInvoiceDetail/{invoiceId}")]
+        public async Task<IActionResult> GetInvoiceDetailByInvoiceIdAsy(int invoiceId)
+        {
+            if (invoiceId == null || invoiceId == 0)
+                return BadRequest("invoiceId must be not null and greater than zero");
+
+            var invoice = await _invoiceService.GetInvoiceDetailByInvoiceId(invoiceId);
+            return Ok(invoice);
+        }
+
     }
 }

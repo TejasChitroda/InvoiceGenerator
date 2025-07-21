@@ -108,6 +108,11 @@ namespace Invoice_Generator.Services.Implementations
         {
             return await _unitOfWork.Invoices.GetByIdAsync(id);
         }
+
+        public async Task<IEnumerable<InvoiceDetail>> GetInvoiceDetailByInvoiceId(int invoiceId)
+        {
+            return await _unitOfWork.InvoiceDetails.FindAsync(i => i.InvoiceId == invoiceId);
+        }
     }
 }
 

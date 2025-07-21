@@ -34,6 +34,7 @@ export class Invoice {
   invoices: InvoiceGenerate[] = [];
   selectedInvoiceDetails: InvoiceDetail[] = [];
   showModal: boolean = false;
+  grandTotal: number = 0;
 
 
   constructor(private invoiceService: InvoiceService, private productService: ProductService , private customerService: CustomerService) { }
@@ -49,11 +50,13 @@ export class Invoice {
     this.loadInvoices();
     this.loadProducts();
     this.loadCustomers();
+    
   }
 
   loadInvoices() {
     this.invoiceService.getAllInvoices().subscribe((data: any) => {
       this.invoices = data;
+      console.log(this.invoices);
     });
   }
   loadProducts() {
@@ -85,6 +88,8 @@ export class Invoice {
     this.items.push(newItem);
   }
 
+  
+
   submitInvoice(){
     const invoiceData: InvoiceRequestDto = {
       customerId: this.selectedCustomerId,
@@ -99,16 +104,22 @@ export class Invoice {
     return this.selectedCustomerId > 0 && this.selectedProductId > 0 && this.quantity > 0;
   }
 
-  openInvoiceDetails(invoiceId: number) {
-    this.selectedInvoiceDetails = this.invoiceDetails.filter(i => i.invoiceId === invoiceId);
+  getInvoiceDetails(invoiceId: number): void {
+    this.invoiceService.getInvoiceDetailByInvoiceId(invoiceId).subscribe((details: any) => {
+      this.selectedInvoiceDetails = details as InvoiceDetail[];
+      console.log('Invoice Details:', this.selectedInvoiceDetails);
+      this.showModal = true;
+    });
+}
+
+ openInvoiceDetails(invoiceId: number) {
+    this.getInvoiceDetails(invoiceId);
     this.showModal = true;
-  }
+}
 
   closeModal() {
     this.showModal = false;
     this.selectedInvoiceDetails = [];
   }
-
-  
 
 }
