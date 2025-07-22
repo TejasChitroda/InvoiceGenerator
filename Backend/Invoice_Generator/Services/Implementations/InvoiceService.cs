@@ -80,7 +80,6 @@ namespace Invoice_Generator.Services.Implementations
 
             await _unitOfWork.Invoices.AddAsync(invoiceModel);
 
-            // Replace AddRangeAsync with a loop to add each InvoiceDetail individually
             foreach (var detail in invoiceModel.InvoiceDetails)
             {
                 await _unitOfWork.InvoiceDetails.AddAsync(detail);
