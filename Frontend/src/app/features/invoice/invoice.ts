@@ -14,13 +14,13 @@ import { InvoiceGenerate } from '../../shared/models/invoiceGenerate.model';
 
 @Component({
   selector: 'app-invoice',
-  imports: [CommonModule , FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './invoice.html',
   styleUrl: './invoice.css'
 })
 export class Invoice {
 
- 
+
 
   productsMap: { [id: number]: string } = {};
   customers: CustomerModel[] = [];
@@ -37,9 +37,9 @@ export class Invoice {
   grandTotal: number = 0;
 
 
-  constructor(private invoiceService: InvoiceService, private productService: ProductService , private customerService: CustomerService) { }
+  constructor(private invoiceService: InvoiceService, private productService: ProductService, private customerService: CustomerService) { }
 
-  invoiceData : InvoiceModel = {
+  invoiceData: InvoiceModel = {
     customerId: 0,
     productId: 0,
     quantity: 0
@@ -50,7 +50,7 @@ export class Invoice {
     this.loadInvoices();
     this.loadProducts();
     this.loadCustomers();
-    
+
   }
 
   loadInvoices() {
@@ -76,11 +76,13 @@ export class Invoice {
   }
 
   getProductName(productId: number): string {
+    this.productService.getById(productId).subscribe((product: ProductModel) => {
+      this.productsMap[productId] = product.name;
+    });
     return this.productsMap[productId] || 'Unknown';
   }
 
-  addItem()
-  {
+  addItem() {
     const newItem: InvoiceItemDto = {
       productId: this.selectedProductId,
       quantity: this.quantity
@@ -88,16 +90,23 @@ export class Invoice {
     this.items.push(newItem);
   }
 
-  
 
-  submitInvoice(){
+
+  submitInvoice() {
     const invoiceData: InvoiceRequestDto = {
       customerId: this.selectedCustomerId,
       items: this.items
     };
     this.invoiceService.addInvoice(invoiceData).subscribe((response) => {
       console.log('Invoice created successfully:', response);
+      this.loadInvoices();
+      this.items = [];
+      this.selectedCustomerId = 0;
+      this.selectedProductId = 0;
+      this.quantity = 1;
     });
+
+    this.loadInvoices();
   }
 
   isFormValid(): boolean {
@@ -110,12 +119,17 @@ export class Invoice {
       console.log('Invoice Details:', this.selectedInvoiceDetails);
       this.showModal = true;
     });
-}
+  }
 
- openInvoiceDetails(invoiceId: number) {
+  getInvoiceTotalByInvoiceId(invoiceId: number): number {
+    const invoice = this.invoices.find(inv => inv.id === invoiceId);
+    return invoice ? invoice.grandTotal : 0;
+  }
+
+  openInvoiceDetails(invoiceId: number) {
     this.getInvoiceDetails(invoiceId);
     this.showModal = true;
-}
+  }
 
   closeModal() {
     this.showModal = false;

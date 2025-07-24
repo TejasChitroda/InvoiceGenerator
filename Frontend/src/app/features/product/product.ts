@@ -9,7 +9,7 @@ import { ProductPrice } from '../../shared/models/productPrice.model';
 
 @Component({
   selector: 'app-product',
-  imports: [CommonModule , FormsModule ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './product.html',
   styleUrl: './product.css'
 })
@@ -19,14 +19,14 @@ export class Product {
   categories: CategoryModel[] = [];
   isEditing: boolean = false;
   editId: number | null = null;
-  
+
   categoryNames: { [productId: number]: string } = {};
 
   productFormItem: ProductModel = {
     name: '',
     description: '',
     categoryId: 0,
-    taxPercentage: 0
+    taxPercentage: 0, // Assuming taxPercentage can be null
   };
 
   priceFormItem: ProductPrice = {
@@ -37,38 +37,35 @@ export class Product {
     isDefault: false,
   };
 
-  constructor(private productService: ProductService , private categoryService: CategoryService) { }
+  constructor(private productService: ProductService, private categoryService: CategoryService) { }
 
 
-  ngOnInit()
-  {
+  ngOnInit() {
     this.loadProducts();
     this.loadCategories();
   }
 
-  loadProducts()
-  {
+  loadProducts() {
     this.productService.getAllProducts().subscribe((products) => {
       this.products = products;
       console.log(products);
     });
   }
-  loadCategories()
-  {
+  loadCategories() {
     this.categoryService.getAllCategories().subscribe((categories) => {
       this.categories = categories;
       console.log(categories);
     });
   }
 
-  getCategoryName(categoryId: number): string {
-    const category = this.categories.find(cat => cat.id === categoryId);
+  getCategoryName(category: any): string {
+    // console.log(category.id);
     return category ? category.name : 'Unknown Category';
   }
 
-    submitForm() {
+  submitForm() {
     if (this.isEditing && this.editId) {
-      const updatedProduct: ProductModel = { ...this.productFormItem};
+      const updatedProduct: ProductModel = { ...this.productFormItem };
       this.productService.updateProduct(this.editId, updatedProduct).subscribe(() => {
         this.resetForm();
         this.loadProducts();
@@ -87,7 +84,7 @@ export class Product {
     this.isEditing = true;
   }
 
-  
+
   resetForm() {
     this.productFormItem = { name: '', description: '', taxPercentage: 0, categoryId: 0 };
     this.isEditing = false;
@@ -95,8 +92,8 @@ export class Product {
   }
 
   delete(id: number) {
-      if (confirm('Are you sure?')) {
-        this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+    if (confirm('Are you sure?')) {
+      this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
     }
   }
 
@@ -109,9 +106,8 @@ export class Product {
     });
   }
 
-  setPrice()
-  {
- this.productService.addPrice(this.getDataFromPriceForm()).subscribe({
+  setPrice() {
+    this.productService.addPrice(this.getDataFromPriceForm()).subscribe({
       next: (msg) => {
         alert(msg);
         this.priceFormItem = { productId: 0, price: 0, effectiveFrom: '', effectiveTo: '', isDefault: false };
@@ -126,9 +122,8 @@ export class Product {
   }
 
 
-  getDataFromPriceForm()
-  {
-    const form = { ...this.priceFormItem};
+  getDataFromPriceForm() {
+    const form = { ...this.priceFormItem };
 
     const fromDate = form.effectiveFrom && form.effectiveFrom.trim() !== '';
     const toDate = form.effectiveTo && form.effectiveTo.trim() !== '';
@@ -145,12 +140,12 @@ export class Product {
   }
 
   onDefaultChange() {
-  const val = this.priceFormItem.isDefault.toString().trim().toLowerCase();
-  this.priceFormItem.isDefault = (val === 'yes');
+    const val = this.priceFormItem.isDefault.toString().trim().toLowerCase();
+    this.priceFormItem.isDefault = (val === 'yes');
 
-  if (this.priceFormItem.isDefault) {
-    this.priceFormItem.effectiveFrom = '';
-    this.priceFormItem.effectiveTo = '';
+    if (this.priceFormItem.isDefault) {
+      this.priceFormItem.effectiveFrom = '';
+      this.priceFormItem.effectiveTo = '';
+    }
   }
-}
 }

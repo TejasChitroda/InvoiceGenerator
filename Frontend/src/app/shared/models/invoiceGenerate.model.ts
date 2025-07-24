@@ -5,7 +5,7 @@ export interface InvoiceGenerate {
   id: number;
   invoiceDate: string;
   customerId: number;
-  grantTotal: number;
+  grandTotal: number;
   customer: CustomerModel;
   invoiceDetails: InvoiceDetail[];
 }

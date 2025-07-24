@@ -39,6 +39,7 @@ export class Customer {
       this.customerService.updateCustomer(this.customer.id!, this.customer).subscribe(updatedCustomer => {
         console.log('Customer updated:', updatedCustomer);
         this.resetForm();
+        this.getCustomers();
       }, error => {
         console.error('Error updating customer:', error);
       });
@@ -49,6 +50,7 @@ export class Customer {
       }, error => {
         console.error('Error adding customer:', error);
       });
+      this.getCustomers();
     }
     this.getCustomers();
   }
